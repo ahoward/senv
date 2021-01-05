@@ -65,11 +65,7 @@
 
   #
     run do
-      #if ARGV.include?('-h') || ARGV.include?('--help')
-        #show_help!
-      #else
-        exec!
-      #end
+      exec!
     end
 
   #
