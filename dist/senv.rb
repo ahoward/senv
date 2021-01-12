@@ -2,38 +2,19 @@
 # encoding: utf-8
 
 #
-  HELP =<<-____
-      VERSION
-        <%= Senv.version %>
+  HELP = <<-____
 
-      TL;DR;
+    NAME
+      senv - secure 12-factor environment variables
 
-        $ tree ./config/senvs/
+    VERSION
+      <%= Senv.version %>
 
-          config/senvs/
-           development.enc.rb
-           development.rb
-           development.yml
-           development.json
-           production.enc.rb
-           production.rb
-           production.yml
-           staging.json
-           staging.enc.rb
-           staging.rb
-           staging.yml
-           staging.json
+    TL;DR;
 
+      # WIP ...
 
-       ~> export SENV=production
-
-       ~> ./bin/senv run-something-in-production senv
-
-       ~> ./bin/senv @staging # show it
-
-       ~> ./bin/senv @staging run-something-in-staging-senv
-
-    ____
+  ____
 
 #
   require "pathname"
@@ -50,13 +31,13 @@
 #
   Senv.script do
     before do
-      $handle_senv_alias_argument = proc do
+      $handle_senv_alias = proc do
         if ARGV.first =~ /^@/
           ENV['SENV'] = ARGV.shift.sub(/^@/, '').strip
         end
       end.call
 
-      $handle_cries_for_help = proc do
+      $handle_old_fashioned_cries_for_help = proc do
         if ARGV.delete('-h') || ARGV.delete('--help')
           ARGV.unshift('help')
         end
@@ -304,6 +285,16 @@ BEGIN {
     def Senv.version
       VERSION
     end
+
+  #
+    LICENSE = 'MIT'.freeze
+
+    def Senv.license
+      LICENSE
+    end
+
+  #
+    SUMMARY = ''
 
   #
     DEFAULT = 'development'.freeze
