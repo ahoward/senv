@@ -22,6 +22,16 @@
     end
 
   #
+    LICENSE = 'MIT'.freeze
+
+    def Senv.license
+      LICENSE
+    end
+
+  #
+    SUMMARY = ''
+
+  #
     DEFAULT = 'development'.freeze
 
     def Senv.default
