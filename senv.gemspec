@@ -7,26 +7,26 @@ Gem::Specification::new do |spec|
   spec.platform = Gem::Platform::RUBY
   spec.summary = "senv"
   spec.description = "description: senv kicks the ass"
-  spec.license = "Ruby"
+  spec.license = "MIT"
 
   spec.files =
 ["LICENSE",
  "README",
  "Rakefile",
+ "a.rb",
  "bin",
  "bin/senv",
+ "dist",
+ "dist/senv-0.4.2-linux-x86.tgz",
+ "dist/senv-0.4.2-linux-x86_64.tgz",
+ "dist/senv-0.4.2-osx.tgz",
+ "dist/senv.rb",
+ "dist/senv.sh",
  "lib",
- "lib/script.rb",
  "lib/senv",
  "lib/senv.rb",
- "s",
- "s/foo.enc.rb",
- "senv.gemspec",
- "test",
- "test/leak.rb",
- "test/lib",
- "test/lib/testing.rb",
- "test/map_test.rb"]
+ "lib/senv/script.rb",
+ "senv.gemspec"]
 
   spec.executables = ["senv"]
   

@@ -376,6 +376,8 @@
           end
       end
 
+      FileUtils.mkdir_p(File.dirname(path))
+
       IO.binwrite(path, data)
     end
 

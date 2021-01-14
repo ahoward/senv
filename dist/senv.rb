@@ -1,5 +1,6 @@
 #! /usr/bin/env ruby
 # encoding: utf-8
+if $0 == __FILE__
 
 #
   HELP = <<-____
@@ -257,6 +258,8 @@
       end
     end
   end
+
+end
 
 
 BEGIN {
@@ -640,6 +643,8 @@ BEGIN {
             abort "could not encrypt `#{ data.to_s.split("\n").first }...` with key `#{ Senv.key }` from `#{ Senv.key_source }`"
           end
       end
+
+      FileUtils.mkdir_p(File.dirname(path))
 
       IO.binwrite(path, data)
     end
