@@ -14,9 +14,6 @@ SYNOPSIS
 DESCRIPTION
 ===========
 
-TL;DR;
-------
-
 *senv* is a command line tool that let's you manage named sets of encrypted
 environment variables across platforms, frameworks, and languages.  it works
 for development and production, on dev boxen, and in production.
@@ -63,8 +60,42 @@ environment with, for example
 
 or
 
-
     ~> senv @test ./run/my/tests.js
+
+of course, senv also supports management of these files, for example
+encrypting them is as simple as
+
+    ~> cat /tmp/development.json | senv .write .senv/development.enc.json
+
+and reading it back as simply
+
+    ~> senv .read .senv/development.enc.json
+
+it can spawn your $EDITOR directly via
+
+    ~> senv .edit .senv/production.enc.rb
+
+in addition to simple yaml, and json files, one can also load '.rb' files,
+which are parsed with ruby syntax.  and this can massively simplify managing
+complex sets of environment variables for any application
+
+for example, this does what you'd expect
+
+    # file : .senv/all.enc.rb
+    ENV['API_KEY'] = '1234-xyz'
+
+    # file : .senv/development.rb
+    Senv.load(:all)
+    ENV['DB_URL'] = 'db://dev-url'
+
+    # file : .senv/production.rb
+    Senv.load(:all)
+    ENV['DB_URL'] = 'db://prod-url'
+
+    ~> senv @production
+    ---
+    API_KEY : 1234-xyz
+    DB_URL : db://prod-url
 
 
 
