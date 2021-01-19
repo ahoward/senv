@@ -4,87 +4,108 @@ senv - secure 12-factor env vars for your apps, in any lang, local and remote
 
 SYNOPSIS
 ========
-@ syntax
+```bash
+    ~> senv @production run-you-server-in-the-production-environment.py
 
-    ~> senv @development ./node/server
+    ~> SENV=development senv your-development-server.rb
 
-    ~> senv @staging ./go/server
-
-    ~> senv @production ./ruby/server
-
-inline via environment variable
-
-    ~> SENV=production senv ./app/server
-
-via environment variable
-
-    ~> export SENV=development
-    ~> senv ./app/server
+    ~> export SENV=test
+    ~> senv run-my-tests.go
+```
 
 DESCRIPTION
 ===========
-*senv* is a command line tool that let's you manage named sets of encrypted
-environment variables across platforms, frameworks, and languages.  it works
-for development and production, on dev boxen, and in docker
+*senv* is a command that lets you run other commands under named sets of
+environment variables.  named sets are specified via the _@name_ syntax, or by
+setting the meta-environment variable SENV.  the named set, which is stored
+locally, but encrypted, will be unpacked before running your process, which
+can be written in any language, and all the variables for that SENV will be
+loaded into the process environment.  *senv* stores it's environment files in
+your project's '.senv' directory so, given:
 
-*senv* operates over text files stored in a '.senv' directory, typically in
-your project's root.  in this directory are meta stuff like your key:
+    .senv/
+    ├── development.enc.json
+    ├── development.json
+    ├── production.enc.json
+    └── production.json
 
-    .senv/.key
+one can run commands such as
 
-and config files in .json, .yaml, or .rb format:
+    # load all development environment variables, encrypted and non-encrypted,
+    # before running app.py
 
-    .senv/development.json
-    .senv/development.enc.json
-    .senv/production.json
-    .senv/production.enc.json
+      ~> senv @development app.py 
+
+    # load the encrypted/non-encrypted SENV named 'production' and run app.js
+
+      ~> export SENV=production
+      ~> senv app.js
+
+    # if no command is given, simply show the @named environment
+
+      ~> senv @development
+
+      ~> senv @production | grep DATABASE_URL
+
+the '.senv' directory is searched for 'upwards', similarly to how git finds
+its '.git' directory, and will normally exist at your project's root.  in it
+are text based config files in .json, .yaml, or .rb format, in both encrypted,
+and un-encrypted flavors.  senv merges them into one set at load time, using
+the encryption key stored in '.senv/.key'
 
 *NOTE:* you will never check in your .senv/.key file.  *ADD IT TO YOUR .gitignore*
 
 config files can be either non-encrypted, or encrypted.  encrpted files are
 stored with '.enc' in the filename, obviously.
 
-for json, or yaml (yml) files, one can define static dictionaries of
-environment key=val mappings, for example, in a file named
+config files can be either non-encrypted, for example 'development.json', or
+encrypted, as for the filename 'development.enc.json'.  for both 'json' and
+'yaml' formats, the files must be simple dictionaries/hashes containing
+key=var pairs, which will be set in the process's environment
 
-    .senv/development.yaml
-
-one might have:
+so given .senv/development.yaml containing
 
     APP_ENV : development
     USE_SSL : false
 
-and, in a file that, to the naked eye, is full of encrypted garbage, named
-
-    .senv/development.enc.yaml
-
-something like: 
+and .senv/development.enc.yaml containing (albeit as encrypted text)
 
     API_KEY : very-sensitive-info-654321
 
-now, you can run commands with these variables loaded into the processs'
-environment with, for example
+running
 
-    ~> senv @development ./start/my/server-process.js
+    ~> senv @development
 
-of course, senv also supports management of these files, for example
-encrypting them is as simple as
+will show (or run another command) in this environment
+
+    ---
+    APP_ENV : development
+    USE_SSL : false
+    API_KEY : very-sensitive-info-654321
+
+
+of course, senv also supports management of these files
+
+    # encrypt a config file
 
     ~> cat /tmp/development.json | senv .write .senv/development.enc.json
 
-and reading it back as simply
+    # read a config file
 
     ~> senv .read .senv/development.enc.json
 
-it can spawn your $EDITOR directly via
+    # edit a config file using the value of $EDITOR like a good unix gal
 
     ~> senv .edit .senv/production.enc.rb
 
-in addition to simple yaml, and json files, one can also load '.rb' files,
-which are parsed with ruby syntax.  and this can massively simplify managing
-complex sets of environment variables for any application
 
-for example, this does what you'd expect
+
+
+note that, in addition to simple yaml, and json files, one can also load '.rb'
+files, which are parsed with full ruby syntax.  and this can massively
+simplify managing complex sets of environment variables for any application.
+
+this does what you'd expect:
 
     # file : .senv/all.enc.rb
     ENV['API_KEY'] = '1234-xyz'

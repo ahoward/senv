@@ -4,3 +4,4 @@ TODO
 a.rb
 pkg/
 tmp/
+.senv/
