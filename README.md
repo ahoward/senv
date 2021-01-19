@@ -203,7 +203,6 @@ in the end.  simple is better.
 
 WHY?
 ====
-
 so many tools exist to load a file full of environment variables.  all of them
 expose these variables to arbitrary code anytime you:
 
@@ -266,12 +265,6 @@ don't be that guy.
 
 EXAMPLES
 ========
-now, because i like a bit of irony, this repo actually has a .senv/.key
-checked in.  *ZOIKS SCOOB!*
-
-but that's is *only* to support running the below examples.  never do what i
-did, and you'll be all good.
-
     # setup a directory to use senv, including making some sample config files
      
       ~> senv .setup /full/path/to/directory
@@ -346,3 +339,63 @@ ENVIRONMENT
 REFMASTER
 =========
   http://github.com/ahoward/senv
+
+TL;DR;
+======
+it's at the bottom because everyone should read the docs ;-)
+
+```
+↟ senv[]@master $ senv .setup .                                                                                                                                                        
+[SENV] setup /home/ahoward/git/ahoward/senv/.senv                                                                                                                                      
+- .senv/all.rb                                                                                                                                                                         
+- .senv/development.enc.rb                                                                                                                                                             
+- .senv/development.rb                                                                                                                                                                 
+- .senv/production.enc.rb                                                                                                                                                              
+- .senv/production.rb                                                                                                                                                                  
+
+↟ senv[]@master $ cat .senv/all.rb                                                                                                                                                     
+ENV['A'] = 'one'                                                                                                                                                                       
+ENV['B'] = 'two'                                                                                                                                                                       
+ENV['C'] = 'three'                                                                                                                                                                     
+
+↟ senv[]@master $ cat .senv/production.rb                                                                                                                                              
+Senv.load(:all)                                                                                                                                                                        
+ENV['B'] = 'two (via production.rb)'                                                                                                                                                   
+
+↟ senv[]@master $ cat .senv/production.enc.rb                                                                                                                                          
+0GWID?䱐xAǼdW)\        1waxE͑!k
+
+↟ senv[]@master $ senv .read .senv/production.enc.rb                                                                                                                                   
+Senv.load(:all)                                                                                                                                                                        
+ENV['C'] = 'three (via production.enc.rb)'                                                                                                                                             
+
+↟ senv[]@master $ cat .senv/.key                                                                                                                                                       
+770db0fd-fddc-4c8c-a264-37d15766d0a5                                                                                                                                                   
+
+↟ senv[]@master $ senv @production                                                                                                                                                     
+---                                                                                                                                                                                    
+A: one                                                                                                                                                                                 
+B: two (via production.rb)                                                                                                                                                             
+C: three (via production.enc.rb)                                                                                                                                                       
+
+↟ senv[]@master $ rm .senv/.key
+
+↟ senv[]@master $ senv @production                                                          
+Senv.key not found in : /home/ahoward/git/ahoward/senv/.senv/.key                          
+
+↟ senv[]@master $ SENV_KEY=770db0fd-fddc-4c8c-a264-37d15766d0a5 senv @proudction
+---                                                                                                                                                                                    
+A: one                                                                                                                                                                                 
+B: two (via production.rb)                                                                                                                                                             
+C: three (via production.enc.rb)                                                                                                                                                       
+
+↟ senv[]@master $ cat a.sh
+#! /bin/sh
+echo $C
+
+↟ senv[]@master $ SENV=production SENV_KEY=770db0fd-fddc-4c8c-a264-37d15766d0a5 senv ./a.sh
+three (via production.enc.rb)
+```
+
+:wq
+
