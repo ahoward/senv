@@ -5,12 +5,14 @@ senv - secure 12-factor env vars for your apps, in any lang, local and remote
 SYNOPSIS
 ========
 ```bash
-    ~> senv @production run-you-server-in-the-production-environment.py
 
-    ~> SENV=development senv your-development-server.rb
+  ~> senv @production run-you-server-in-the-production-environment.py
 
-    ~> export SENV=test
-    ~> senv run-my-tests.go
+  ~> SENV=development senv your-development-server.rb
+
+  ~> export SENV=test
+  ~> senv run-my-tests.go
+
 ```
 
 DESCRIPTION
@@ -23,11 +25,15 @@ can be written in any language, and all the variables for that SENV will be
 loaded into the process environment.  *senv* stores it's environment files in
 your project's '.senv' directory so, given:
 
-    .senv/
-    ├── development.enc.json
-    ├── development.json
-    ├── production.enc.json
-    └── production.json
+```text
+
+  .senv/
+  ├── development.enc.json
+  ├── development.json
+  ├── production.enc.json
+  └── production.json
+
+```
 
 one can run commands such as
 
