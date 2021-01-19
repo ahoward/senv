@@ -291,6 +291,10 @@ if $0 == __FILE__
       end
     end
 
+    run '.help' do
+      show_help!
+    end
+
   #
     def show_help!
       help = ERB.new(u.unindent(HELP)).result(::TOPLEVEL_BINDING)

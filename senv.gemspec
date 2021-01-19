@@ -3,29 +3,30 @@
 
 Gem::Specification::new do |spec|
   spec.name = "senv"
-  spec.version = "0.4.2"
+  spec.version = "0.4.3"
   spec.platform = Gem::Platform::RUBY
   spec.summary = "senv"
   spec.description = "description: senv kicks the ass"
   spec.license = "MIT"
 
   spec.files =
-["LICENSE",
- "README",
+["EXAMPLES.md",
+ "LICENSE",
+ "README.md",
  "Rakefile",
- "a.rb",
  "bin",
  "bin/senv",
  "dist",
- "dist/senv-0.4.2-linux-x86.tgz",
- "dist/senv-0.4.2-linux-x86_64.tgz",
- "dist/senv-0.4.2-osx.tgz",
+ "dist/senv-0.4.3-linux-x86.tgz",
+ "dist/senv-0.4.3-linux-x86_64.tgz",
+ "dist/senv-0.4.3-osx.tgz",
  "dist/senv.rb",
  "dist/senv.sh",
  "lib",
  "lib/senv",
  "lib/senv.rb",
  "lib/senv/script.rb",
+ "samples",
  "senv.gemspec"]
 
   spec.executables = ["senv"]
