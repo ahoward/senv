@@ -14,6 +14,7 @@ Gem::Specification::new do |spec|
  "LICENSE",
  "README.md",
  "Rakefile",
+ "a.sh",
  "bin",
  "bin/senv",
  "dist",
