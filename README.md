@@ -97,8 +97,8 @@ for example, this does what you'd expect
     DB_URL : db://prod-url
 
 one can access the environment as in the examples above, using the senv cli
-program to run another command, but the environments can also be loaded into
-shell scripts via
+program to run another command, but the environment can also be loaded into
+your shell scripts via
 
     # import all senv env vars into this script
     eval $(senv init -)
@@ -123,10 +123,10 @@ senv supports 3 methods of installation
   * unpack the distribution
   * make sure the ./bin/ directory in the distribution is your $PATH
 
-* as standalone ruby file, depending only on ruby (not rubygems/bundler etc)
+* as standalone ruby script/lib, depending only on ruby (not rubygems/bundler etc)
   * grab the distribution here https://github.com/ahoward/senv/blob/main/dist/senv.rb
   * drop it in, for example, ./lib/, and 'require "./lib/senv.rb"'
-  * the distribution is both the lib, and the command line script, so that
+  * the distribution is both the lib, and the *command line script*, so that
     *same file* can be saved both as './lib/senv.rb' *and* './bin/senv', a
     clever person might save just as './lib/senv.rb' and make a symlink
     './bin/senv' -> './lib/senv.rb'
@@ -151,33 +151,51 @@ no.
 
 you will check it in.  you will put it in your backups.  but most of all
 you'll pass all the info inside it around in slack, email, text, and whatsapp
-because you don't have a better way to give it to people.
+because you don't have a better way to give it to people.  and you'll do this
+for each of the 17 config settings your 12-factor app nees.   check it all in,
+encrypt what is sensitive, and reduce your problem to merely needing to get
+the next girl *one single key* to unpack the whole lot.  btw, for this, i
+recommend using
 
-check it in.  drive all your blames into git.  have mercy on the developers
-that come after to you and make them need *one peice* of information to get the
-app running.  ps.  also use docker, but that is for another day...
+https://onetimesecret.com/
 
 now, about the key.  there are two main approaches.
 
-1) store all your keys on a thumbdrive, symlink them into your projects
-2) just understand how to set *one environment varible*, your SENV\_KEY and do
-that by hand when you start work on a project.  aka
+put it on disk, in .senv/.key, this is, at least, a large level of
+indirection, an attacker needs to know a lot more, and look a lot harder to
+figure out how to locate that key, and run some commands to unpack config
+files.  however, ideally you won't store the key on disk at all and, instead,
+with either manage some symlinks such that your .senv/.key resides on a
+thumbdrive, or, far simpler, just understand how to set *one variable* in your
+shell and do that when working on the project, after all what could be simpler
+than just doing
 
-    export SENV_KEY=my-key
+    export SENV_ENV=teh-passwordz-y
 
-or get fancy
+or, super fancy
 
     SENV_KEY=my-key exec $SHELL
 
-if you have trouble managing a single environment varible in your shell(s) ask
-yourself if you should have unencrypted credentials for your employer or
-client's application on your hard drive...
+or, power-neck-beard
+
+    SENV_KEY=my-key tmux 
+
+or
+
+    SENV_KEY=teh-key visual-studio-magick-coding-ide
+
+except that last one.  that won't work.  if you are uncomfortable on the
+command line, and manging environment variables senv may not be for you.
+however, if that is the case then managing *unencrypted* files full of api
+keys is *definitely not for you*
+
+in the end.  simple is better.
 
 
 WHY?
 ----
 
-many tools exist to load a file full of environment variables.  all of them
+so many tools exist to load a file full of environment variables.  all of them
 expose these variables to arbitrary code anytime you:
 
 * run `npm install`, `bundle install`, `pip install`
@@ -213,46 +231,91 @@ differently:
 
 however, all of these solutions, including some of my work, operate at the
 wrong level, which is to say at the language or framework level.  this misses,
-entirely, the point of configuring applications via the environment; by
-requiring tight integration, such as the addition of libraries and tooling
-into projects to manage, load, and set environment variables, we reduce
-significantly the simplicity of a pure 12-factor app that does only.
-
+entirely, the point of configuring applications via the environment in the
+ordained 12-factor way; by requiring tight integration, such as the addition
+of libraries and tooling into projects to manage, load, and set environment
+variables, we reduce significantly the simplicity of a pure 12-factor app that
+does only.
 
     const DATABASE_URL = process.env.DATABASE_URL;
 
-
 it's easy to make this mistake and, so long as your project remains a
-monolith, it works just fine.  until it doesn't.  as many of us know, a real,
-modern, web project is unlikely to remain a single process in a single
-framework and language.  micro-services will be introduced.  background jobs
-will get introduced.  someone will split the main web app from the consumer
-app.  everything will get re-written in node, and then go.  finally, each
-developer in every language will solve the problem their own way, and pass
-around unencrypted text files full of sensitive information all day long like
-someone yelling 'b-crypt' very slowly in bounded time.  someone will port the
-application deployment from heroku to gcp, and re-tool setting 100
-confiuration variables instead of the one meta SENV\_KEY to rule them all.
+monolith, it works just fine.  until it doesn't.
 
+as many of us know, a real, modern, web project is unlikely to remain a single
+process in a single framework and language.  micro-services will be
+introduced.  background jobs will get introduced.  someone will split the main
+web app from the consumer app.  everything will get re-written in node, and
+then go.  finally, each developer in every language will solve the problem
+their own way, and pass around unencrypted text files full of sensitive
+information all day long like someone yelling 'b-crypt' very slowly in bounded
+time.  someone will port the application deployment from heroku to gcp, and
+re-tool setting 100 confiuration variables instead of the one meta SENV\_KEY
+to rule them all.  he'll be a 'dev-ops' guy, kind of an asshole, and he'll
+grind deployments down from a 3 minute process to a 3 week fight about vpns.
+don't be that guy.
 
 EXAMPLES
 ========
-# setup a project with a .senv directory and key
-#
-  ~> senv .setup .
 
-# store your environment variables in the repo, but _encrypted_
-#
-  ~> cat development.json | senv .write .senv/development.enc.json 
-  ~> cat production.json | senv .write .senv/production.enc.json 
+now, because i like a bit of irony, this repo actually has a .senv/.key
+checked in.  *ZOIKS SCOOB!*
 
-# run your app under various 'sets' of environment variables, but sleep well,
-# knowing you can check these into you repo
-#
-  ~> senv @development ./app/server
+but that's is *only* to support running the below examples.  never do what i
+did, and you'll be good.
 
-  ~> senv @production ./app/server
+    # setup a directory to use senv, including making some sample config files
+     
+      ~> senv .setup /full/path/to/directory
 
-REF
-===
+    # setup _this_ directory
+
+      ~> senv .setup
+
+    # encrypt a file
+     
+      ~> senv /tmp/development.json | senv .write .senv/development.enc.json
+
+    # read a file, encrypted or not
+     
+      ~> senv .read .senv/development.enc.json
+      ~> senv .read .senv/development.json
+
+    # show all the environemnt settings for the production environment
+
+      ~> senv @production
+
+    # run a command under an environment
+    
+      ~> senv @test ./run/the/tests.js
+
+    # edit a file, encrypted or not, using the $EDITOR like all unix citizens
+    
+      ~> senv .edit ./senv/production.enc.rb
+
+    # pluck a single value from a config set
+
+      ~> senv .get API_KEY
+
+    # load an entire senv into a shell script
+
+      #! /bin/sh
+      export SENV=production
+      eval $(senv init -)
+
+    # load senv in ruby program
+     
+      #! /usr/bin/env ruby
+      require 'senv'
+      Senv.load(:all)
+
+    # setup a project with a .senv directory and key, this will drop in some
+    # sample files
+    #
+
+    ~> senv .setup .
+
+
+REFMASTER
+=========
   http://github.com/ahoward/senv

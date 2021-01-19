@@ -5,15 +5,51 @@ if $0 == __FILE__
 #
   HELP = <<-____
 
-    NAME
-      senv - the secure 12-factor environment variable your mother told you to use
+    # setup a directory to use senv, including making some sample config files
+     
+      ~> senv .setup /full/path/to/directory
 
-    VERSION
-      <%= Senv.version %>
+    # setup _this_ directory
 
-    TL;DR;
+      ~> senv .setup
 
-      # WIP ...
+    # encrypt a file
+     
+      ~> senv /tmp/development.json | senv .write .senv/development.enc.json
+
+    # read a file, encrypted or not
+     
+      ~> senv .read .senv/development.enc.json
+      ~> senv .read .senv/development.json
+
+    # show all the environemnt settings for the production environment
+
+      ~> senv @production
+
+    # run a command under an environment
+    
+      ~> senv @test ./run/the/tests.js
+
+    # edit a file, encrypted or not, using the $EDITOR like all unix citizens
+    
+      ~> senv .edit ./senv/production.enc.rb
+
+    # pluck a single value from a config set
+
+      ~> senv .get API_KEY
+
+    # load an entire senv into a shell script
+
+      #! /bin/sh
+      export SENV=production
+      eval $(senv init -)
+
+    # load senv in ruby program
+     
+      #! /usr/bin/env ruby
+      require 'senv'
+      Senv.load(:all)
+
 
   ____
 
