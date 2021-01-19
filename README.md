@@ -127,8 +127,7 @@ senv supports 3 methods of installation
 
 * as a standalone binary, with *zero dependencies*
   * grab the distribution for your platform at https://github.com/ahoward/senv/tree/main/dist
-  * if you don't know which flavor of linux you are on run `uname -a` and
-  * look at the output
+    * if you don't know which flavor of linux you are on run `uname -a` and look at the output
   * unpack the distribution
   * make sure the ./bin/ directory in the distribution is your $PATH
 
