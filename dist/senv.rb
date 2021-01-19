@@ -5,15 +5,75 @@ if $0 == __FILE__
 #
   HELP = <<-____
 
-    NAME
-      senv - secure 12-factor environment variables
+  NAME
+  ========
+    senv - secure 12-factor env vars for your apps, in any lang, local and remote
 
-    VERSION
-      <%= Senv.version %>
+  EXAMPLES
+  ========
+    # setup a directory to use senv, including making some sample config files
+     
+      ~> senv .setup /full/path/to/directory
 
-    TL;DR;
+    # setup _this_ directory
 
-      # WIP ...
+      ~> senv .setup
+
+    # encrypt a file
+     
+      ~> senv /tmp/development.json | senv .write .senv/development.enc.json
+
+    # read a file, encrypted or not
+     
+      ~> senv .read .senv/development.enc.json
+      ~> senv .read .senv/development.json
+
+    # show all the environemnt settings for the production environment
+
+      ~> senv @production
+
+    # run a command under an environment
+    
+      ~> senv @test ./run/the/tests.js
+
+    # edit a file, encrypted or not, using the $EDITOR like all unix citizens
+    
+      ~> senv .edit ./senv/production.enc.rb
+
+    # pluck a single value from a config set
+
+      ~> senv .get API_KEY
+
+    # load an entire senv into a shell script
+
+      #! /bin/sh
+      export SENV=production
+      eval $(senv init -)
+
+    # load senv into yer ruby program
+     
+      #! /usr/bin/env ruby
+      require 'senv'
+      Senv.load(:all)
+
+  ENVIRONMENT
+  ===========
+    the following environment variables affect senv itself
+
+    SENV
+      specify which senv should be loaded
+
+    SENV_KEY
+      specify the encryption key via the environment
+
+    SENV_PATH
+      a colon separated set of paths in which to search for '.senv' directories
+
+    SENV_ROOT
+      the location of the .senv directory
+
+    SENV_DEBUG
+      you guessed it
 
   ____
 
@@ -82,17 +142,23 @@ if $0 == __FILE__
 
       key.strip!
 
+      dir = File.expand_path(dir)
+
+      FileUtils.mkdir_p(dir)
+
       Dir.chdir(dir) do
+      #
         if test(?d, '.senv')
           abort "#{ dir }/.senv directory exists"
         end
 
         FileUtils.mkdir_p('.senv')
 
-        IO.binwrite('.senv/_key', "#{ key }\n")
+        IO.binwrite('.senv/.key', "#{ key }\n")
 
         Senv.key = key
 
+      #
         Senv.write(
           '.senv/all.rb',
           u.unindent(
@@ -110,7 +176,6 @@ if $0 == __FILE__
             u.unindent(
               <<-____
                 Senv.load(:all)
-
                 ENV['B'] = 'two (via #{ env }.rb)'
               ____
             )
@@ -121,14 +186,14 @@ if $0 == __FILE__
             u.unindent(
               <<-____
                 Senv.load(:all)
-
                 ENV['C'] = 'three (via #{ env }.enc.rb)'
               ____
             )
           )
         end
 
-        puts "[SENV] setup #{ File.expand_path(dir) }" 
+      #
+        puts "[SENV] setup #{ dir }/.senv" 
 
         Dir.glob('.senv/**/**').sort.each do |entry|
           next unless test(?f, entry)
@@ -283,7 +348,7 @@ BEGIN {
 #
   module Senv
   #
-    VERSION = '0.4.2'.freeze
+    VERSION = '0.4.3'.freeze
 
     def Senv.version
       VERSION
@@ -565,7 +630,7 @@ BEGIN {
     end
 
     def Senv.key_path
-      Senv.directory.join('_key')
+      Senv.directory.join('.key')
     end
 
     def Senv.key

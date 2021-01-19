@@ -23,7 +23,6 @@ via environment variable
 
 DESCRIPTION
 ===========
-
 *senv* is a command line tool that let's you manage named sets of encrypted
 environment variables across platforms, frameworks, and languages.  it works
 for development and production, on dev boxen, and in docker
@@ -203,7 +202,7 @@ in the end.  simple is better.
 
 
 WHY?
-----
+====
 
 so many tools exist to load a file full of environment variables.  all of them
 expose these variables to arbitrary code anytime you:
@@ -267,12 +266,11 @@ don't be that guy.
 
 EXAMPLES
 ========
-
 now, because i like a bit of irony, this repo actually has a .senv/.key
 checked in.  *ZOIKS SCOOB!*
 
 but that's is *only* to support running the below examples.  never do what i
-did, and you'll be good.
+did, and you'll be all good.
 
     # setup a directory to use senv, including making some sample config files
      
