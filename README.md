@@ -4,14 +4,12 @@ senv - 12-factor env vars for your apps, checked *securely* into your repo, for 
 
 SYNOPSIS
 ========
-```
-  ~> senv @development ./node/server
+    ~> senv @development ./node/server
 
-  ~> senv @staging ./go/server
+    ~> senv @staging ./go/server
 
-  ~> senv @production ./ruby/server
+    ~> senv @production ./ruby/server
 
-```
 
 DESCRIPTION
 ===========
@@ -26,14 +24,14 @@ for development and production, on dev boxen, and in production.
 *senv* operates over text files stored in a '.senv/' directory, typically in
 your project's root.  in this directory is meta stuff like your key:
 
-  .senv/.key
+    .senv/.key
 
 and config files in .json, .yaml, or .rb format.  for example:
 
-  .senv/development.json
-  .senv/development.enc.json
-  .senv/production.json
-  .senv/production.enc.json
+    .senv/development.json
+    .senv/development.enc.json
+    .senv/production.json
+    .senv/production.enc.json
 
 note: you will never check in your .senv/.key file.  *add it to your .gitignore*
 
@@ -43,33 +41,30 @@ stored with '.enc' in the filename, obviously.
 for json, or yaml (yml) files, one can define static dictionaries of
 environment key=val mappings, for example, in a file named
 
-  .senv/development.yaml
+    .senv/development.yaml
 
 one might have:
 
-  APP_ENV : development
-  USE_SSL : false
+    APP_ENV : development
+    USE_SSL : false
 
 and, in a file that, to the naked eye, is full of encrypted garbage, named
 
-  .senv/development.enc.yaml
+    .senv/development.enc.yaml
 
 something like: 
 
-  API_KEY : very-sensitive-info-654321
+    API_KEY : very-sensitive-info-654321
 
 now, you can run commands with these variables loaded into the processs'
 environment with, for example
 
-```
-  senv @development ./start/my/server-process.py
-```
+    ~> senv @development ./start/my/server-process.py
 
 or
 
-```
-  senv @test ./run/my/tests.js
-```
+
+    ~> senv @test ./run/my/tests.js
 
 
 
