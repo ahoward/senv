@@ -297,7 +297,7 @@
     end
 
     def Senv.key_path
-      Senv.directory.join('_key')
+      Senv.directory.join('.key')
     end
 
     def Senv.key

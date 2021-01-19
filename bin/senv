@@ -6,7 +6,7 @@ if $0 == __FILE__
   HELP = <<-____
 
     NAME
-      senv - secure 12-factor environment variables
+      senv - the secure 12-factor environment variable your mother told you to use
 
     VERSION
       <%= Senv.version %>
@@ -82,17 +82,23 @@ if $0 == __FILE__
 
       key.strip!
 
+      dir = File.expand_path(dir)
+
+      FileUtils.mkdir_p(dir)
+
       Dir.chdir(dir) do
+      #
         if test(?d, '.senv')
           abort "#{ dir }/.senv directory exists"
         end
 
         FileUtils.mkdir_p('.senv')
 
-        IO.binwrite('.senv/_key', "#{ key }\n")
+        IO.binwrite('.senv/.key', "#{ key }\n")
 
         Senv.key = key
 
+      #
         Senv.write(
           '.senv/all.rb',
           u.unindent(
@@ -110,7 +116,6 @@ if $0 == __FILE__
             u.unindent(
               <<-____
                 Senv.load(:all)
-
                 ENV['B'] = 'two (via #{ env }.rb)'
               ____
             )
@@ -121,14 +126,14 @@ if $0 == __FILE__
             u.unindent(
               <<-____
                 Senv.load(:all)
-
                 ENV['C'] = 'three (via #{ env }.enc.rb)'
               ____
             )
           )
         end
 
-        puts "[SENV] setup #{ File.expand_path(dir) }" 
+      #
+        puts "[SENV] setup #{ dir }/.senv" 
 
         Dir.glob('.senv/**/**').sort.each do |entry|
           next unless test(?f, entry)

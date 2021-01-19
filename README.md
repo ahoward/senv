@@ -1,13 +1,79 @@
 NAME
 ====
-  senv - the secure 12-factor environment variable tool your mother warned you to use
+senv - 12-factor env vars for your apps, checked *securely* into your repo, for dev and prod, in any language.
 
 SYNOPSIS
 ========
-  senv ./app/entrypoint/
+```
+  ~> senv @development ./node/server
+
+  ~> senv @staging ./go/server
+
+  ~> senv @production ./ruby/server
+
+```
 
 DESCRIPTION
 ===========
+
+TL;DR;
+------
+
+*senv* is a command line tool that let's you manage named sets of encrypted
+environment variables across platforms, frameworks, and languages.  it works
+for development and production, on dev boxen, and in production.
+
+*senv* operates over text files stored in a '.senv/' directory, typically in
+your project's root.  in this directory is meta stuff like your key:
+
+  .senv/.key
+
+and config files in .json, .yaml, or .rb format.  for example:
+
+  .senv/development.json
+  .senv/development.enc.json
+  .senv/production.json
+  .senv/production.enc.json
+
+note: you will never check in your .senv/.key file.  *add it to your .gitignore*
+
+config files can be either non-encrypted, or encrypted.  encrpted files are
+stored with '.enc' in the filename, obviously.
+
+for json, or yaml (yml) files, one can define static dictionaries of
+environment key=val mappings, for example, in a file named
+
+  .senv/development.yaml
+
+one might have:
+
+  APP_ENV : development
+  USE_SSL : false
+
+and, in a file that, to the naked eye, is full of encrypted garbage, named
+
+  .senv/development.enc.yaml
+
+something like: 
+
+  API_KEY : very-sensitive-info-654321
+
+now, you can run commands with these variables loaded into the processs'
+environment with, for example
+
+```
+  senv @development ./start/my/server-process.py
+```
+
+or
+
+```
+  senv @test ./run/my/tests.js
+```
+
+
+
+
 
 Motivation
 ----------
@@ -70,6 +136,21 @@ hidden mine-field burried deep in our
 
 EXAMPLES
 ========
+# setup a project with a .senv directory and key
+#
+  ~> senv .setup .
+
+# store your environment variables in the repo, but _encrypted_
+#
+  ~> cat development.json | senv .write .senv/development.enc.json 
+  ~> cat production.json | senv .write .senv/production.enc.json 
+
+# run your app under various 'sets' of environment variables, but sleep well,
+# knowing you can check these into you repo
+#
+  ~> senv @development ./app/server
+
+  ~> senv @production ./app/server
 
 URI
 ===
