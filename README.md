@@ -1,15 +1,25 @@
 NAME
 ====
-senv - 12-factor env vars for your apps, checked *securely* into your repo, for dev and prod, in any language.
+senv - secure 12-factor env vars for your apps, in any lang, local and remote
 
 SYNOPSIS
 ========
+@ syntax
+
     ~> senv @development ./node/server
 
     ~> senv @staging ./go/server
 
     ~> senv @production ./ruby/server
 
+inline via environment variable
+
+    ~> SENV=production senv ./app/server
+
+via environment variable
+
+    ~> export SENV=development
+    ~> senv ./app/server
 
 DESCRIPTION
 ===========
@@ -314,6 +324,25 @@ did, and you'll be good.
     #
 
     ~> senv .setup .
+
+ENVIRONMENT
+===========
+  the following environment variables affect senv itself
+
+    SENV
+      specify which senv should be loaded
+
+    SENV_KEY
+      specify the encryption key via the environment
+
+    SENV_PATH
+      a colon separated set of paths in which to search for '.senv' directories
+
+    SENV_ROOT
+      the location of the .senv directory
+
+    SENV_DEBUG
+      you guessed it
 
 
 REFMASTER

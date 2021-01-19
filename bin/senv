@@ -5,6 +5,12 @@ if $0 == __FILE__
 #
   HELP = <<-____
 
+  NAME
+  ========
+    senv - secure 12-factor env vars for your apps, in any lang, local and remote
+
+  EXAMPLES
+  ========
     # setup a directory to use senv, including making some sample config files
      
       ~> senv .setup /full/path/to/directory
@@ -44,12 +50,30 @@ if $0 == __FILE__
       export SENV=production
       eval $(senv init -)
 
-    # load senv in ruby program
+    # load senv into yer ruby program
      
       #! /usr/bin/env ruby
       require 'senv'
       Senv.load(:all)
 
+  ENVIRONMENT
+  ===========
+    the following environment variables affect senv itself
+
+    SENV
+      specify which senv should be loaded
+
+    SENV_KEY
+      specify the encryption key via the environment
+
+    SENV_PATH
+      a colon separated set of paths in which to search for '.senv' directories
+
+    SENV_ROOT
+      the location of the .senv directory
+
+    SENV_DEBUG
+      you guessed it
 
   ____
 
