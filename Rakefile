@@ -238,62 +238,6 @@ task :dist => [:dist_rb] do
       spawn[cmd]
       spawn["tar -xzf #{ basename }"]
       Fu.rm(basename)
-
-      if test(?d, 'lib/vendor')
-        %`
-          # Remove tests
-          rm -rf lib/vendor/ruby/*/gems/*/test
-          rm -rf lib/vendor/ruby/*/gems/*/tests
-          rm -rf lib/vendor/ruby/*/gems/*/spec
-          rm -rf lib/vendor/ruby/*/gems/*/features
-          rm -rf lib/vendor/ruby/*/gems/*/benchmark
-
-          # Remove documentation
-          rm -f lib/vendor/ruby/*/gems/*/README*
-          rm -f lib/vendor/ruby/*/gems/*/CHANGE*
-          rm -f lib/vendor/ruby/*/gems/*/Change*
-          rm -f lib/vendor/ruby/*/gems/*/COPYING*
-          rm -f lib/vendor/ruby/*/gems/*/LICENSE*
-          rm -f lib/vendor/ruby/*/gems/*/MIT-LICENSE*
-          rm -f lib/vendor/ruby/*/gems/*/TODO
-          rm -f lib/vendor/ruby/*/gems/*/*.txt
-          rm -f lib/vendor/ruby/*/gems/*/*.md
-          rm -f lib/vendor/ruby/*/gems/*/*.rdoc
-          rm -rf lib/vendor/ruby/*/gems/*/doc
-          rm -rf lib/vendor/ruby/*/gems/*/docs
-          rm -rf lib/vendor/ruby/*/gems/*/example
-          rm -rf lib/vendor/ruby/*/gems/*/examples
-          rm -rf lib/vendor/ruby/*/gems/*/sample
-          rm -rf lib/vendor/ruby/*/gems/*/doc-api
-          find lib/vendor/ruby -name '*.md' | xargs rm -f
-
-          # Remove misc unnecessary files
-          rm -rf lib/vendor/ruby/*/gems/*/.gitignore
-          rm -rf lib/vendor/ruby/*/gems/*/.travis.yml
-
-          # Remove leftover native extension sources and compilation objects
-          rm -f lib/vendor/ruby/*/gems/*/ext/Makefile
-          rm -f lib/vendor/ruby/*/gems/*/ext/*/Makefile
-          rm -f lib/vendor/ruby/*/gems/*/ext/*/tmp
-          find lib/vendor/ruby -name '*.c' | xargs rm -f
-          find lib/vendor/ruby -name '*.cpp' | xargs rm -f
-          find lib/vendor/ruby -name '*.h' | xargs rm -f
-          find lib/vendor/ruby -name '*.rl' | xargs rm -f
-          find lib/vendor/ruby -name 'extconf.rb' | xargs rm -f
-          find lib/vendor/ruby/*/gems -name '*.o' | xargs rm -f
-          find lib/vendor/ruby/*/gems -name '*.so' | xargs rm -f
-          find lib/vendor/ruby/*/gems -name '*.bundle' | xargs rm -f
-
-          # Remove Java files. They're only used for JRuby support
-          find lib/vendor/ruby -name '*.java' | xargs rm -f
-          find lib/vendor/ruby -name '*.class' | xargs rm -f
-        `.split("\n") do |line|
-          next if line =~ /^\s*#/
-          next if line =~ /^\s*$/
-          cmd = line.strip
-          spawn[cmd]
-        end
-      end
     end
 
     Dir.chdir(distdir) do

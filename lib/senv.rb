@@ -21,8 +21,7 @@
       VERSION
     end
 
-  #
-    LICENSE = 'MIT'.freeze
+    LICENSE = 'Nonstandard'.freeze # https://github.com/raisely/NoHarm
 
     def Senv.license
       LICENSE

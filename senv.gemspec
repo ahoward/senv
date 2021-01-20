@@ -3,15 +3,15 @@
 
 Gem::Specification::new do |spec|
   spec.name = "senv"
-  spec.version = "0.4.3"
+  spec.version = "0.4.4"
   spec.platform = Gem::Platform::RUBY
   spec.summary = "senv"
   spec.description = "description: senv kicks the ass"
-  spec.license = "MIT"
+  spec.license = "Nonstandard"
 
   spec.files =
 ["EXAMPLES.md",
- "LICENSE",
+ "LICENSE.md",
  "README.md",
  "Rakefile",
  "a.sh",

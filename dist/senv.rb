@@ -5,75 +5,93 @@ if $0 == __FILE__
 #
   HELP = <<-____
 
-  NAME
-  ========
-    senv - secure 12-factor env vars for your apps, in any lang, local and remote
+    NAME
+    ========
+      senv - secure 12-factor env vars for your apps, in any lang, local and remote
 
-  EXAMPLES
-  ========
-    # setup a directory to use senv, including making some sample config files
-     
-      ~> senv .setup /full/path/to/directory
+    EXAMPLES
+    ========
+      # setup a directory to use senv, including making some sample config files
+       
+        ~> senv .setup /full/path/to/directory
 
-    # setup _this_ directory
+      # setup _this_ directory
 
-      ~> senv .setup
+        ~> senv .setup
 
-    # encrypt a file
-     
-      ~> senv /tmp/development.json | senv .write .senv/development.enc.json
+      # encrypt a file
+       
+        ~> senv /tmp/development.json | senv .write .senv/development.enc.json
 
-    # read a file, encrypted or not
-     
-      ~> senv .read .senv/development.enc.json
-      ~> senv .read .senv/development.json
+      # read a file, encrypted or not
+       
+        ~> senv .read .senv/development.enc.json
+        ~> senv .read .senv/development.json
 
-    # show all the environemnt settings for the production environment
+      # show all the environemnt settings for the production environment
 
-      ~> senv @production
+        ~> senv @production
 
-    # run a command under an environment
-    
-      ~> senv @test ./run/the/tests.js
+          -or-
 
-    # edit a file, encrypted or not, using the $EDITOR like all unix citizens
-    
-      ~> senv .edit ./senv/production.enc.rb
+        ~> SENV=production senv
 
-    # pluck a single value from a config set
+          -or-
 
-      ~> senv .get API_KEY
+        ~> export SENV=production
+        ~> senv
 
-    # load an entire senv into a shell script
+      # run a command under an @environment named 'test'
+      
+        ~> senv @test ./run/the/tests.js
 
-      #! /bin/sh
-      export SENV=production
-      eval $(senv init -)
+      # edit a file, encrypted or not, using the $EDITOR like all good unix denizens 
+      
+        ~> senv .edit ./senv/production.enc.rb
+        ~> senv .edit ./senv/staging.json
 
-    # load senv into yer ruby program
-     
-      #! /usr/bin/env ruby
-      require 'senv'
-      Senv.load(:all)
+      # pluck a single value from a config set, useful in scripts
 
-  ENVIRONMENT
-  ===========
-    the following environment variables affect senv itself
+        ~> senv @production .get API_KEY
 
-    SENV
-      specify which senv should be loaded
+          -or-
 
-    SENV_KEY
-      specify the encryption key via the environment
+        ~> SENV=production senv .get API_KEY
 
-    SENV_PATH
-      a colon separated set of paths in which to search for '.senv' directories
 
-    SENV_ROOT
-      the location of the .senv directory
+      # load an entire senv into a shell script
 
-    SENV_DEBUG
-      you guessed it
+        #! /bin/sh
+        export SENV=production
+        eval $(senv init -)
+
+      # load senv into yer ruby program
+       
+        #! /usr/bin/env ruby
+        require 'senv'
+        Senv.load(:all)
+
+    ENVIRONMENT
+    ===========
+    the following environment variables affect senv _itself_
+
+      SENV
+        specify which senv should be loaded, alternately use the
+        '@environment-name' syntax
+
+      SENV_KEY
+        specify the encryption key via the environment
+
+      SENV_PATH
+        a colon separated set of paths in which to search for '.senv'
+        directories, each of these directories is searched 'upward', similarly
+        to how git find its '.git' directory
+
+      SENV_ROOT
+        the location of the .senv directory
+
+      SENV_DEBUG
+        you guessed it
 
   ____
 
@@ -352,14 +370,13 @@ BEGIN {
 #
   module Senv
   #
-    VERSION = '0.4.3'.freeze
+    VERSION = '0.4.4'.freeze
 
     def Senv.version
       VERSION
     end
 
-  #
-    LICENSE = 'MIT'.freeze
+    LICENSE = 'Nonstandard'.freeze # https://github.com/raisely/NoHarm
 
     def Senv.license
       LICENSE
