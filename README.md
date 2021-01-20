@@ -2,6 +2,10 @@ NAME
 ====
 senv - secure 12-factor env vars for your apps, in any lang, local and remote
 
+GIF
+===
+![](https://i.giphy.com/media/SvpHrehWvbZiin27sm/giphy.webp)
+
 SYNOPSIS
 ========
 ```bash
