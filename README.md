@@ -37,21 +37,25 @@ your project's '.senv' directory so, given:
 
 one can run commands such as
 
-    # load all development environment variables, encrypted and non-encrypted,
-    # before running app.py
+```bash
 
-      ~> senv @development app.py 
+  # load all development environment variables, encrypted and non-encrypted,
+  # before running app.py
 
-    # load the encrypted/non-encrypted SENV named 'production' and run app.js
+    ~> senv @development app.py 
 
-      ~> export SENV=production
-      ~> senv app.js
+  # load the encrypted/non-encrypted SENV named 'production' and run app.js
 
-    # if no command is given, simply show the @named environment
+    ~> export SENV=production
+    ~> senv app.js
 
-      ~> senv @development
+  # if no command is given, simply show the @named environment
 
-      ~> senv @production | grep DATABASE_URL
+    ~> senv @development
+
+    ~> senv @production | grep DATABASE_URL
+
+```
 
 the '.senv' directory is searched for 'upwards', similarly to how git finds
 its '.git' directory, and will normally exist at your project's root.  in it
@@ -60,6 +64,8 @@ and un-encrypted flavors.  senv merges them into one set at load time, using
 the encryption key stored in '.senv/.key'
 
 *NOTE:* you will never check in your .senv/.key file.  *ADD IT TO YOUR .gitignore*
+
+*NOTE*: see above^ note.  #important
 
 config files can be either non-encrypted, or encrypted.  encrpted files are
 stored with '.enc' in the filename, obviously.
@@ -71,41 +77,57 @@ key=var pairs, which will be set in the process's environment
 
 so given .senv/development.yaml containing
 
-    APP_ENV : development
-    USE_SSL : false
+```yaml
+
+  APP_ENV : development
+  USE_SSL : false
+
+```
 
 and .senv/development.enc.yaml containing (albeit as encrypted text)
 
-    API_KEY : very-sensitive-info-654321
+```yaml
+
+  API_KEY : very-sensitive-info-654321
+
+```
 
 running
 
-    ~> senv @development
+```bash
+
+  ~> senv @development
+
+```
 
 will show (or run another command) in this environment
 
-    ---
-    APP_ENV : development
-    USE_SSL : false
-    API_KEY : very-sensitive-info-654321
+```yaml
 
+  ---
+  APP_ENV : development
+  USE_SSL : false
+  API_KEY : very-sensitive-info-654321
+
+```
 
 of course, senv also supports management of these files
 
-    # encrypt a config file
+```bash
 
-    ~> cat /tmp/development.json | senv .write .senv/development.enc.json
+  # encrypt a config file
 
-    # read a config file
+  ~> cat /tmp/development.json | senv .write .senv/development.enc.json
 
-    ~> senv .read .senv/development.enc.json
+  # read a config file
 
-    # edit a config file using the value of $EDITOR like a good unix gal
+  ~> senv .read .senv/development.enc.json
 
-    ~> senv .edit .senv/production.enc.rb
+  # edit a config file using the value of $EDITOR like a good unix gal
 
+  ~> senv .edit .senv/production.enc.rb
 
-
+```
 
 note that, in addition to simple yaml, and json files, one can also load '.rb'
 files, which are parsed with full ruby syntax.  and this can massively
@@ -113,119 +135,182 @@ simplify managing complex sets of environment variables for any application.
 
 this does what you'd expect:
 
-    # file : .senv/all.enc.rb
-    ENV['API_KEY'] = '1234-xyz'
+```ruby
+
+  # file : .senv/all.enc.rb
+  ENV['API_KEY'] = '1234-xyz'
 
 
-    # file : .senv/development.rb
-    Senv.load(:all)
-    ENV['DB_URL'] = 'db://dev-url'
+  # file : .senv/development.rb
+  Senv.load(:all)
+  ENV['DB_URL'] = 'db://dev-url'
 
 
-    # file : .senv/production.rb
-    Senv.load(:all)
-    ENV['DB_URL'] = 'db://prod-url'
+  # file : .senv/production.rb
+  Senv.load(:all)
+  ENV['DB_URL'] = 'db://prod-url'
 
 
-    ~> senv @production
-    ---
-    API_KEY : 1234-xyz
-    DB_URL : db://prod-url
+  ~> senv @production
+  ---
+  API_KEY : 1234-xyz
+  DB_URL : db://prod-url
+
+```
+
+and so does this
+
+```ruby
+
+  # file : .senv/all.enc.rb
+  ('A' .. 'Z').each do |alpha|
+    ENV[alpha] = 'one for every letter in the alphabet'
+  end
+  
+
+```
 
 one can access the environment as in the examples above, using the senv cli
-program to run another command, but the environment can also be loaded into
-your shell scripts via
+program to run another command, but the environment can be loaded
+programatically as well:
 
-    # import all senv env vars into this script
-    eval $(senv init -)
+in your shell scripts via
+
+```bash
+
+  # import all senv env vars into this script
+  eval $(senv init -)
+
+```
 
 or, in ruby programs via
 
-    require 'senv'
-    Senv.load( ENV['APP_ENV'] || ENV['RAILS_ENV'] || 'development' )
+```ruby
 
-learn more by installing senv and running
+  require 'senv'
 
-    senv .help
+  ENV['APP_ENV'] == 'production' ? Senv.load(:production) : Senv.load(:development)
+
+```
+
+learn more, and increase your ninja score, by installing senv and running
+
+```bash
+
+  senv .help
+
+```
 
 INSTALL
 =======
 senv supports 3 methods of installation
 
-* as a standalone binary, with *zero dependencies*
-  * grab the distribution for your platform at https://github.com/ahoward/senv/tree/main/dist
-    * if you don't know which flavor of linux you are on run `uname -a` and look at the output
-  * unpack the distribution
-  * make sure the ./bin/ directory in the distribution is your $PATH
+Stand Alone Binary Distribution
+-------------------------------
+* grab the distribution for your platform at https://github.com/ahoward/senv/tree/main/dist
+  * if you don't know which flavor of linux you are on run `uname -a` and look at the output
+* unpack the distribution
+* make sure the ./bin/ directory in the distribution is your $PATH
 
-* as standalone ruby script/lib, depending only on ruby (not rubygems/bundler etc)
-  * grab the distribution here https://github.com/ahoward/senv/blob/main/dist/senv.rb
-  * drop it in, for example, ./lib/, and 'require "./lib/senv.rb"'
-  * the distribution is both the lib, and the *command line script*, so that
-    *same file* can be saved both as './lib/senv.rb' *and* './bin/senv', a
-    clever person might save just as './lib/senv.rb' and make a symlink
-    './bin/senv' -> './lib/senv.rb'
+Stand Alone, Dependency-less, Ruby Script
+-----------------------------------------
+* grab the distribution here https://github.com/ahoward/senv/blob/main/dist/senv.rb
+* drop it in, for example, ./lib/, and 'require "./lib/senv.rb"'
+* the distribution is both the lib, and the *command line script*, so that
+  *same file* can be saved both as './lib/senv.rb' *and* './bin/senv', a
+  clever person might save just as './lib/senv.rb' and make a symlink
+  from './lib/senv.rb' to './bin/senv'
 
-* via rubygems/bundler
-  * in Gemfile, gem 'senv'
-  * or via rubygems, 'gem install senv'
+RubyGems/Bundler
+----------------
+* in Gemfile, gem 'senv'
+* or via rubygems, 'gem install senv'
 
 BIKESHED
 ========
-
 Q1:
 ---
-
 isn't this an imaginary problem?  aren't i still pretty professional dropping
 all my crap in a .env file and calling it a day?
 
 A1:
 ---
-
 no.
 
 you will check it in.  you will put it in your backups.  but most of all
 you'll pass all the info inside it around in slack, email, text, and whatsapp
 because you don't have a better way to give it to people.  and you'll do this
-for each of the 17 config settings your 12-factor app nees.   check it all in,
-encrypt what is sensitive, and reduce your problem to merely needing to get
-the next girl *one single key* to unpack the whole lot.  btw, for this, i
-recommend using
+for each of the 17 config settings your 12-factor app needs. as will the other
+11 developers that touch the code over the next 2 years.   
+
+check it all in.  drive all blames into git.
+
+encrypt what is sensitive, and reduce your problem to merely needing to give
+the next girl *one single key* to unpack the whole lot.  btw, for this,
+passing around an senv key, i recommend using
 
 https://onetimesecret.com/
 
-now, about the key.  there are two main approaches.
+Q2:
+---
+i call b.s., the key _and_ the program that uses it to encrypt are still on
+disk.  i'm paranoid and want to solve this problem, along with rewriting the
+laws of thermodynamics to eliminate 'time t' from the equations.  i program
+scala and haskell.
 
-put it on disk, in .senv/.key, this is, at least, a large level of
-indirection, an attacker needs to know a lot more, and look a lot harder to
-figure out how to locate that key, and run some commands to unpack config
-files.  however, ideally you won't store the key on disk at all and, instead,
-with either manage some symlinks such that your .senv/.key resides on a
-thumbdrive, or, far simpler, just understand how to set *one variable* in your
-shell and do that when working on the project, after all what could be simpler
-than just doing
+A2:
+---
+carlo has #2 solved for you, at least mostly - https://www.goodreads.com/book/show/36442813-the-order-of-time
 
-    export SENV_ENV=teh-passwordz-y
+now, about the key.  there are two main approaches to keeping the key, the
+code that uses it, and the config values, separate:
 
-or, super fancy
+0.  this one really doesn't count as one of the two, but if you are not ultra
+    paranoid it is worth mentioning that the difference between having files
+    that are encrypted at rest, with a key that needs located, and a process
+    that knows how to use that key to unpack a binary file full of garbage is
+    *light years* more complex to exploit vs. having unencrypted credentials
+    lying around in your repo for any backup, stray command, or git commit to
+    reveal to the world.
 
-    SENV_KEY=my-key exec $SHELL
+1.  symlinks are magic.  use a thumb drive.  keep all your keys there.
+    symlink them into your project.  unplug the drive when you are not running
+    'npm install' or anytime your paranoia compells you to do something.  rest
+    well knowing attackes need something you know, the credentials, and
+    something you have, the thumb drive.
 
-or, power-neck-beard
+2.  avoid complexity.  learn your shell.  set one damn envronment varialbe
+    when you start working on a project.  bask in the free time and lack of
+    complexity.  indeed, managing an single environment variable setting can,
+    and does, befuddle many a programmer, but this is a great time to dicuss
+    whether those programmers should have access to any sensitive information,
+    let alone in unencrypted files lying around on thier personal machines.
+    doing it the 'unix way' just isn't that hard:
 
-    SENV_KEY=my-key tmux 
+```bash
 
-or
+    # export the var, do the work
+    ~> export SENV_ENV=teh-passwordz-y
 
-    SENV_KEY=teh-key visual-studio-magick-coding-ide
+    # fancy 
+    ~> SENV_KEY=my-key exec $SHELL
 
-except that last one.  that won't work.  if you are uncomfortable on the
-command line, and manging environment variables senv may not be for you.
-however, if that is the case then managing *unencrypted* files full of api
-keys is *definitely not for you*
+    # fancier
+    ~> SENV_KEY=my-key tmuxinator
 
-in the end.  simple is better.
+    # ultra fancy and magic, also possibly broken...
+    ~> SENV_KEY=teh-key visual-studio-magick-coding-ide-thing
 
+```
+
+all of the above a good solutions, execpt the last one. that won't work.
+acutally, it might.  if you are uncomfortable on the command line, and manging
+environment variables, senv may not be for you.  however, if that is the case
+then managing *unencrypted* files full of api keys is *definitely not for
+you*.
+
+in the end.  simple is better, and the power of plaintext endures across
+presidents and epidemics.
 
 WHY?
 ====
@@ -247,8 +332,8 @@ this problem is neither theoritical nor FUD based:
 * *and a million other reasons not to store unencrypted environment variables*
 * https://lmgtfy.app/#gsc.tab=0&gsc.q=malicious%20packages%20env
 
-solutions to this problem exist, i authored the original solution for the ruby
-programming language:
+solutions to this problem exist, indeed, i authored the original solution for
+the ruby programming language:
 
 * https://github.com/ahoward/sekrets
 
@@ -258,20 +343,24 @@ this solution was eventually adapted and merged into 'Ruby on Rails':
 * https://guides.rubyonrails.org/4_1_release_notes.html
 
 solutions exist for es6, javascript, go, and many languages.  each operates
-differently:
+'cowboy differently':
 
 * https://github.com/kunalpanchal/secure-env
 * https://github.com/envkey/envkeygo
 
-however, all of these solutions, including some of my work, operate at the
-wrong level, which is to say at the language or framework level.  this misses,
-entirely, the point of configuring applications via the environment in the
-ordained 12-factor way; by requiring tight integration, such as the addition
-of libraries and tooling into projects to manage, load, and set environment
+however, all of these solutions, including my own, operate at the wrong level,
+which is to say at the language or framework level.  this misses, entirely,
+the point of configuring applications via the environment in the ordained
+12-factor way; by requiring tight integration, such as the addition of
+libraries and tooling into projects to manage, load, and set environment
 variables, we reduce significantly the simplicity of a pure 12-factor app that
 does only.
 
-    const DATABASE_URL = process.env.DATABASE_URL;
+```javascript
+
+    const DATABASE_URL = process.env.DATABASE_URL
+
+```
 
 it's easy to make this mistake and, so long as your project remains a
 monolith, it works just fine.  until it doesn't.
@@ -287,141 +376,76 @@ time.  someone will port the application deployment from heroku to gcp, and
 re-tool setting 100 confiuration variables instead of the one meta SENV\_KEY
 to rule them all.  he'll be a 'dev-ops' guy, kind of an asshole, and he'll
 grind deployments down from a 3 minute process to a 3 week fight about vpns.
+
 don't be that guy.
 
-EXAMPLES
-========
-    # setup a directory to use senv, including making some sample config files
-     
-      ~> senv .setup /full/path/to/directory
-
-    # setup _this_ directory
-
-      ~> senv .setup
-
-    # encrypt a file
-     
-      ~> senv /tmp/development.json | senv .write .senv/development.enc.json
-
-    # read a file, encrypted or not
-     
-      ~> senv .read .senv/development.enc.json
-      ~> senv .read .senv/development.json
-
-    # show all the environemnt settings for the production environment
-
-      ~> senv @production
-
-    # run a command under an environment
-    
-      ~> senv @test ./run/the/tests.js
-
-    # edit a file, encrypted or not, using the $EDITOR like all unix citizens
-    
-      ~> senv .edit ./senv/production.enc.rb
-
-    # pluck a single value from a config set
-
-      ~> senv .get API_KEY
-
-    # load an entire senv into a shell script
-
-      #! /bin/sh
-      export SENV=production
-      eval $(senv init -)
-
-    # load senv in ruby program
-     
-      #! /usr/bin/env ruby
-      require 'senv'
-      Senv.load(:all)
-
-    # setup a project with a .senv directory and key, this will drop in some
-    # sample files
-    #
-
-    ~> senv .setup .
-
-ENVIRONMENT
-===========
-  the following environment variables affect senv itself
-
-    SENV
-      specify which senv should be loaded
-
-    SENV_KEY
-      specify the encryption key via the environment
-
-    SENV_PATH
-      a colon separated set of paths in which to search for '.senv' directories
-
-    SENV_ROOT
-      the location of the .senv directory
-
-    SENV_DEBUG
-      you guessed it
-
-
-REFMASTER
-=========
+REFMASTER, OF THE UNIVERSE
+==========================
   http://github.com/ahoward/senv
 
 TL;DR;
 ======
-it's at the bottom because everyone should read the docs ;-)
+it's at the bottom because everyone should RTfM ;-)
+
+```bash
+  ↟ senv[]@master $ senv .setup .
+  [SENV] setup /home/ahoward/git/ahoward/senv/.senv
+  - .senv/all.rb
+  - .senv/development.enc.rb
+  - .senv/development.rb
+  - .senv/production.enc.rb
+  - .senv/production.rb
+
+  ↟ senv[]@master $ cat .senv/all.rb
+  ENV['A'] = 'one'
+  ENV['B'] = 'two'
+  ENV['C'] = 'three'
+
+  ↟ senv[]@master $ cat .senv/production.rb
+  Senv.load(:all)
+  ENV['B'] = 'two (via production.rb)'
+
+  ↟ senv[]@master $ cat .senv/production.enc.rb
+  0GWID?䱐xAǼdW)\        1waxE͑!k
+
+  ↟ senv[]@master $ senv .read .senv/production.enc.rb
+  Senv.load(:all)
+  ENV['C'] = 'three (via production.enc.rb)'
+
+  ↟ senv[]@master $ cat .senv/.key
+  770db0fd-fddc-4c8c-a264-37d15766d0a5
+
+  ↟ senv[]@master $ senv @production
+  ---
+  A: one
+  B: two (via production.rb)
+  C: three (via production.enc.rb)
+
+  ↟ senv[]@master $ rm .senv/.key
+
+  ↟ senv[]@master $ senv @production
+  Senv.key not found in : /home/ahoward/git/ahoward/senv/.senv/.key
+
+  ↟ senv[]@master $ SENV_KEY=770db0fd-fddc-4c8c-a264-37d15766d0a5 senv @proudction
+  ---
+  A: one
+  B: two (via production.rb)
+  C: three (via production.enc.rb)
+
+  ↟ senv[]@master $ cat a.sh
+  #! /bin/sh
+  echo $C
+
+  ↟ senv[]@master $ SENV=production SENV_KEY=770db0fd-fddc-4c8c-a264-37d15766d0a5 senv ./a.sh
+  three (via production.enc.rb)
 
 ```
-↟ senv[]@master $ senv .setup .                                                                                                                                                        
-[SENV] setup /home/ahoward/git/ahoward/senv/.senv                                                                                                                                      
-- .senv/all.rb                                                                                                                                                                         
-- .senv/development.enc.rb                                                                                                                                                             
-- .senv/development.rb                                                                                                                                                                 
-- .senv/production.enc.rb                                                                                                                                                              
-- .senv/production.rb                                                                                                                                                                  
 
-↟ senv[]@master $ cat .senv/all.rb                                                                                                                                                     
-ENV['A'] = 'one'                                                                                                                                                                       
-ENV['B'] = 'two'                                                                                                                                                                       
-ENV['C'] = 'three'                                                                                                                                                                     
+FINALLY
+=======
+```vim
 
-↟ senv[]@master $ cat .senv/production.rb                                                                                                                                              
-Senv.load(:all)                                                                                                                                                                        
-ENV['B'] = 'two (via production.rb)'                                                                                                                                                   
+  :wqa!
 
-↟ senv[]@master $ cat .senv/production.enc.rb                                                                                                                                          
-0GWID?䱐xAǼdW)\        1waxE͑!k
-
-↟ senv[]@master $ senv .read .senv/production.enc.rb                                                                                                                                   
-Senv.load(:all)                                                                                                                                                                        
-ENV['C'] = 'three (via production.enc.rb)'                                                                                                                                             
-
-↟ senv[]@master $ cat .senv/.key                                                                                                                                                       
-770db0fd-fddc-4c8c-a264-37d15766d0a5                                                                                                                                                   
-
-↟ senv[]@master $ senv @production                                                                                                                                                     
----                                                                                                                                                                                    
-A: one                                                                                                                                                                                 
-B: two (via production.rb)                                                                                                                                                             
-C: three (via production.enc.rb)                                                                                                                                                       
-
-↟ senv[]@master $ rm .senv/.key
-
-↟ senv[]@master $ senv @production                                                          
-Senv.key not found in : /home/ahoward/git/ahoward/senv/.senv/.key                          
-
-↟ senv[]@master $ SENV_KEY=770db0fd-fddc-4c8c-a264-37d15766d0a5 senv @proudction
----                                                                                                                                                                                    
-A: one                                                                                                                                                                                 
-B: two (via production.rb)                                                                                                                                                             
-C: three (via production.enc.rb)                                                                                                                                                       
-
-↟ senv[]@master $ cat a.sh
-#! /bin/sh
-echo $C
-
-↟ senv[]@master $ SENV=production SENV_KEY=770db0fd-fddc-4c8c-a264-37d15766d0a5 senv ./a.sh
-three (via production.enc.rb)
 ```
-
-:wq
 
