@@ -193,7 +193,11 @@ or, in ruby programs via
 
   require 'senv'
 
-  ENV['APP_ENV'] == 'production' ? Senv.load(:production) : Senv.load(:development)
+  if ENV['APP_ENV'] == 'production'
+    Senv.load(:production)
+  else
+    Senv.load(:development)
+  end
 
 ```
 
@@ -430,7 +434,9 @@ it's at the bottom because everyone should RTfM ;-)
   ↟ senv[]@master $ senv @production
   Senv.key not found in : /home/ahoward/git/ahoward/senv/.senv/.key
 
-  ↟ senv[]@master $ SENV_KEY=770db0fd-fddc-4c8c-a264-37d15766d0a5 senv @proudction
+  ↟ senv[]@master $ export SENV_KEY=770db0fd-fddc-4c8c-a264-37d15766d0a5
+
+  ↟ senv[]@master $ senv @proudction
   ---
   A: one
   B: two (via production.rb)
@@ -440,7 +446,7 @@ it's at the bottom because everyone should RTfM ;-)
   #! /bin/sh
   echo $C
 
-  ↟ senv[]@master $ SENV=production SENV_KEY=770db0fd-fddc-4c8c-a264-37d15766d0a5 senv ./a.sh
+  ↟ senv[]@master $ senv ./a.sh
   three (via production.enc.rb)
 
 ```
