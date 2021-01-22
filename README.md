@@ -2,8 +2,10 @@ NAME
 ====
 senv - secure 12-factor env vars for your apps, in any lang, local and remote
 
-GIF
-===
+![](https://raw.githubusercontent.com/ahoward/senv/563c4d069da2e03d4ea60d3cd6fad319a3dc0271/images/senv.svg) 
+
+---
+
 ![](https://i.giphy.com/media/SvpHrehWvbZiin27sm/giphy.webp)
 
 SYNOPSIS
